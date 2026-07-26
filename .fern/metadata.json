@@ -1,0 +1,27 @@
+{
+    "cliVersion": "5.80.2",
+    "generatorName": "fernapi/fern-typescript-sdk",
+    "generatorVersion": "3.83.2",
+    "generatorConfig": {
+        "namespaceExport": "Darwin",
+        "packageJson": {
+            "name": "@darwin-so/sdk",
+            "description": "Official TypeScript SDK for Darwin",
+            "license": "MIT",
+            "homepage": "https://docs.darwin.so/sdks/typescript",
+            "repository": {
+                "type": "git",
+                "url": "git+https://github.com/darwin-studios/darwin-typescript.git"
+            },
+            "bugs": {
+                "url": "https://github.com/darwin-studios/darwin/issues"
+            }
+        }
+    },
+    "originGitCommit": "63c7ed4166c26604d20a61c32b61377e29c49cd4",
+    "originGitCommitIsDirty": false,
+    "invokedBy": "ci",
+    "requestedVersion": "0.1.0",
+    "ciProvider": "github",
+    "sdkVersion": "0.1.0"
+}
