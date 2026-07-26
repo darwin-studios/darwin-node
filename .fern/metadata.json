@@ -5,20 +5,20 @@
     "generatorConfig": {
         "namespaceExport": "Darwin",
         "packageJson": {
-            "name": "@darwin-so/sdk",
+            "name": "@darwinso/sdk",
             "description": "Official TypeScript SDK for Darwin",
             "license": "MIT",
             "homepage": "https://docs.darwin.so/sdks/typescript",
             "repository": {
                 "type": "git",
-                "url": "git+https://github.com/darwin-studios/darwin-typescript.git"
+                "url": "git+https://github.com/darwin-studios/darwin-node.git"
             },
             "bugs": {
-                "url": "https://github.com/darwin-studios/darwin/issues"
+                "url": "https://github.com/darwin-studios/darwin-node/issues"
             }
         }
     },
-    "originGitCommit": "111575739c78c741a0d22baee78ca9d18518857a",
+    "originGitCommit": "1c15a7ddcc4725425317d395be0eb241cfa6f561",
     "originGitCommitIsDirty": false,
     "invokedBy": "ci",
     "requestedVersion": "0.1.0",

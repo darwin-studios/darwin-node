@@ -7,3 +7,6 @@ export * from "./goals/client/requests/index.js";
 export * as goals from "./goals/index.js";
 export * from "./goals/types/index.js";
 export * as integrations from "./integrations/index.js";
+export * from "./tools/client/requests/index.js";
+export * as tools from "./tools/index.js";
+export * from "./tools/types/index.js";

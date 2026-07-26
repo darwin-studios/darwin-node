@@ -17,7 +17,7 @@ export declare namespace GoalsClient {
 }
 
 /**
- * Create and inspect private Darwin goals.
+ * Create and inspect goals for the agent selected on the developer/MCP channel.
  */
 export class GoalsClient {
     protected readonly _options: NormalizedClientOptionsWithAuth<GoalsClient.Options>;

@@ -1,12 +1,11 @@
 {
-    "name": "@darwin-so/sdk",
+    "name": "@darwinso/sdk",
     "version": "0.1.0",
     "private": false,
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/darwin-studios/darwin-typescript.git"
+        "url": "git+https://github.com/darwin-studios/darwin-node.git"
     },
-    "license": "MIT",
     "type": "commonjs",
     "main": "./dist/cjs/index.js",
     "module": "./dist/esm/index.mjs",
@@ -33,6 +32,17 @@
                 "default": "./dist/cjs/api/resources/agent/exports.js"
             },
             "default": "./dist/cjs/api/resources/agent/exports.js"
+        },
+        "./tools": {
+            "import": {
+                "types": "./dist/esm/api/resources/tools/exports.d.mts",
+                "default": "./dist/esm/api/resources/tools/exports.mjs"
+            },
+            "require": {
+                "types": "./dist/cjs/api/resources/tools/exports.d.ts",
+                "default": "./dist/cjs/api/resources/tools/exports.js"
+            },
+            "default": "./dist/cjs/api/resources/tools/exports.js"
         },
         "./goals": {
             "import": {
@@ -112,8 +122,9 @@
     },
     "sideEffects": false,
     "description": "Official TypeScript SDK for Darwin",
+    "license": "MIT",
     "homepage": "https://docs.darwin.so/sdks/typescript",
     "bugs": {
-        "url": "https://github.com/darwin-studios/darwin/issues"
+        "url": "https://github.com/darwin-studios/darwin-node/issues"
     }
 }

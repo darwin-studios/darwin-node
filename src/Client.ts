@@ -4,6 +4,7 @@ import { AgentClient } from "./api/resources/agent/client/Client.js";
 import { ApprovalsClient } from "./api/resources/approvals/client/Client.js";
 import { GoalsClient } from "./api/resources/goals/client/Client.js";
 import { IntegrationsClient } from "./api/resources/integrations/client/Client.js";
+import { ToolsClient } from "./api/resources/tools/client/Client.js";
 import type { BaseClientOptions, BaseRequestOptions } from "./BaseClient.js";
 import { type NormalizedClientOptionsWithAuth, normalizeClientOptionsWithAuth } from "./BaseClient.js";
 import * as core from "./core/index.js";
@@ -17,6 +18,7 @@ export declare namespace DarwinClient {
 export class DarwinClient {
     protected readonly _options: NormalizedClientOptionsWithAuth<DarwinClient.Options>;
     protected _agent: AgentClient | undefined;
+    protected _tools: ToolsClient | undefined;
     protected _goals: GoalsClient | undefined;
     protected _approvals: ApprovalsClient | undefined;
     protected _integrations: IntegrationsClient | undefined;
@@ -27,6 +29,10 @@ export class DarwinClient {
 
     public get agent(): AgentClient {
         return (this._agent ??= new AgentClient(this._options));
+    }
+
+    public get tools(): ToolsClient {
+        return (this._tools ??= new ToolsClient(this._options));
     }
 
     public get goals(): GoalsClient {
