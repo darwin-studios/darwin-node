@@ -1,7 +1,7 @@
 # Darwin TypeScript Library
 
-[![fern shield](https://img.shields.io/badge/%F0%9F%8C%BF-Built%20with%20Fern-brightgreen)](https://buildwithfern.com?utm_source=github&utm_medium=github&utm_campaign=readme&utm_source=https%3A%2F%2Fgithub.com%2Fdarwin-studios%2Fdarwin-typescript)
-[![npm shield](https://img.shields.io/npm/v/)](https://www.npmjs.com/package/)
+[![fern shield](https://img.shields.io/badge/%F0%9F%8C%BF-Built%20with%20Fern-brightgreen)](https://buildwithfern.com?utm_source=github&utm_medium=github&utm_campaign=readme&utm_source=https%3A%2F%2Fgithub.com%2Fdarwin-studios%2Fdarwin-node)
+[![npm shield](https://img.shields.io/npm/v/@darwinso/sdk)](https://www.npmjs.com/package/@darwinso/sdk)
 
 The Darwin TypeScript library provides convenient access to the Darwin APIs from TypeScript.
 
@@ -29,19 +29,19 @@ The Darwin TypeScript library provides convenient access to the Darwin APIs from
 ## Installation
 
 ```sh
-npm i -s 
+npm i -s @darwinso/sdk
 ```
 
 ## Reference
 
-A full reference for this library is available [here](https://github.com/darwin-studios/darwin-typescript/blob/HEAD/./reference.md).
+A full reference for this library is available [here](https://github.com/darwin-studios/darwin-node/blob/HEAD/./reference.md).
 
 ## Usage
 
 Instantiate and use the client with the following:
 
 ```typescript
-import { DarwinClient } from "";
+import { DarwinClient } from "@darwinso/sdk";
 
 const client = new DarwinClient({ token: "YOUR_TOKEN" });
 await client.agent.createMessage({
@@ -54,7 +54,7 @@ await client.agent.createMessage({
 This SDK allows you to configure different environments for API requests.
 
 ```typescript
-import { DarwinClient, DarwinEnvironment } from "Darwin";
+import { DarwinClient, DarwinEnvironment } from "@darwinso/sdk";
 
 const client = new DarwinClient({
     environment: DarwinEnvironment.Production,
@@ -67,7 +67,7 @@ The SDK exports all request and response types as TypeScript interfaces. Simply 
 following namespace:
 
 ```typescript
-import { Darwin } from "Darwin";
+import { Darwin } from "@darwinso/sdk";
 
 const request: Darwin.GetConversationRequest = {
     ...
@@ -80,7 +80,7 @@ When the API returns a non-success status code (4xx or 5xx response), a subclass
 will be thrown.
 
 ```typescript
-import { DarwinError } from "Darwin";
+import { DarwinError } from "@darwinso/sdk";
 
 try {
     await client.agent.createMessage(...);
@@ -101,7 +101,7 @@ try {
 This SDK supports direct imports of subpackage clients, which allows JavaScript bundlers to tree-shake and include only the imported subpackage code. This results in much smaller bundle sizes.
 
 ```typescript
-import { AgentClient } from 'Darwin/agent';
+import { AgentClient } from '@darwinso/sdk/agent';
 
 const client = new AgentClient({...});
 ```
@@ -111,7 +111,7 @@ const client = new AgentClient({...});
 If you would like to send additional headers as part of the request, use the `headers` request option.
 
 ```typescript
-import { DarwinClient } from "Darwin";
+import { DarwinClient } from "@darwinso/sdk";
 
 const client = new DarwinClient({
     ...
@@ -206,7 +206,7 @@ console.log(rawResponse.headers['X-My-Header']);
 The SDK supports logging. You can configure the logger by passing in a `logging` object to the client options.
 
 ```typescript
-import { DarwinClient, logging } from "Darwin";
+import { DarwinClient, logging } from "@darwinso/sdk";
 
 const client = new DarwinClient({
     ...

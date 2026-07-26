@@ -17,7 +17,7 @@ export declare namespace ApprovalsClient {
 }
 
 /**
- * Review decisions requested by the agent.
+ * Review decisions requested by the agent selected on the developer/MCP channel.
  */
 export class ApprovalsClient {
     protected readonly _options: NormalizedClientOptionsWithAuth<ApprovalsClient.Options>;

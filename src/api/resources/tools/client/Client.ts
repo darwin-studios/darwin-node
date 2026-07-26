@@ -10,27 +10,26 @@ import { handleNonStatusCodeError } from "../../../../errors/handleNonStatusCode
 import * as errors from "../../../../errors/index.js";
 import * as Darwin from "../../../index.js";
 
-export declare namespace AgentClient {
+export declare namespace ToolsClient {
     export type Options = BaseClientOptions;
 
     export interface RequestOptions extends BaseRequestOptions {}
 }
 
 /**
- * Talk to the authenticated account. Darwin routes each message to the intended accessible personal or business agent.
+ * Discover and run owner-scoped Darwin capabilities.
  */
-export class AgentClient {
-    protected readonly _options: NormalizedClientOptionsWithAuth<AgentClient.Options>;
+export class ToolsClient {
+    protected readonly _options: NormalizedClientOptionsWithAuth<ToolsClient.Options>;
 
-    constructor(options: AgentClient.Options) {
+    constructor(options: ToolsClient.Options) {
         this._options = normalizeClientOptionsWithAuth(options);
     }
 
     /**
-     * Returns the conversation for the agent currently selected on the developer/MCP channel. Natural-language routing in createMessage updates this selection.
+     * Returns the Darwin capabilities available to developer clients, including their risk classification.
      *
-     * @param {Darwin.GetConversationRequest} request
-     * @param {AgentClient.RequestOptions} requestOptions - Request-specific configuration.
+     * @param {ToolsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Darwin.BadRequestError}
      * @throws {@link Darwin.UnauthorizedError}
@@ -39,24 +38,15 @@ export class AgentClient {
      * @throws {@link errors.DarwinTimeoutError}
      *
      * @example
-     *     await client.agent.getConversation()
+     *     await client.tools.listTools()
      */
-    public getConversation(
-        request: Darwin.GetConversationRequest = {},
-        requestOptions?: AgentClient.RequestOptions,
-    ): core.HttpResponsePromise<Record<string, unknown>> {
-        return core.HttpResponsePromise.fromPromise(this.__getConversation(request, requestOptions));
+    public listTools(requestOptions?: ToolsClient.RequestOptions): core.HttpResponsePromise<Darwin.ListToolsResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__listTools(requestOptions));
     }
 
-    private async __getConversation(
-        request: Darwin.GetConversationRequest = {},
-        requestOptions?: AgentClient.RequestOptions,
-    ): Promise<core.WithRawResponse<Record<string, unknown>>> {
-        const { limit, cursor } = request;
-        const _queryParams: Record<string, unknown> = {
-            limit,
-            cursor,
-        };
+    private async __listTools(
+        requestOptions?: ToolsClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Darwin.ListToolsResponse>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -68,15 +58,11 @@ export class AgentClient {
                 (await core.Supplier.get(this._options.baseUrl)) ??
                     (await core.Supplier.get(this._options.environment)) ??
                     environments.DarwinEnvironment.Production,
-                "agent/conversation",
+                "tools",
             ),
             method: "GET",
             headers: _headers,
-            queryString: core.url
-                .queryBuilder()
-                .addMany(_queryParams)
-                .mergeAdditional(requestOptions?.queryParams)
-                .build(),
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -84,7 +70,7 @@ export class AgentClient {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Record<string, unknown>, rawResponse: _response.rawResponse };
+            return { data: _response.body as Darwin.ListToolsResponse, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
@@ -104,14 +90,14 @@ export class AgentClient {
             }
         }
 
-        return handleNonStatusCodeError(_response.error, _response.rawResponse, "GET", "/agent/conversation");
+        return handleNonStatusCodeError(_response.error, _response.rawResponse, "GET", "/tools");
     }
 
     /**
-     * Darwin infers the intended accessible personal or business agent from the message and current conversation. Name an agent naturally when changing context; ambiguous requests return a clarification without running tools.
+     * Runs a Darwin capability as the API-key owner. Sensitive actions may return an approval request instead of executing immediately.
      *
-     * @param {Darwin.CreateAgentMessageRequest} request
-     * @param {AgentClient.RequestOptions} requestOptions - Request-specific configuration.
+     * @param {Darwin.ExecuteToolRequest} request
+     * @param {ToolsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Darwin.BadRequestError}
      * @throws {@link Darwin.UnauthorizedError}
@@ -120,21 +106,22 @@ export class AgentClient {
      * @throws {@link errors.DarwinTimeoutError}
      *
      * @example
-     *     await client.agent.createMessage({
-     *         content: "content"
+     *     await client.tools.executeTool({
+     *         tool: "tool"
      *     })
      */
-    public createMessage(
-        request: Darwin.CreateAgentMessageRequest,
-        requestOptions?: AgentClient.RequestOptions,
-    ): core.HttpResponsePromise<Record<string, unknown>> {
-        return core.HttpResponsePromise.fromPromise(this.__createMessage(request, requestOptions));
+    public executeTool(
+        request: Darwin.ExecuteToolRequest,
+        requestOptions?: ToolsClient.RequestOptions,
+    ): core.HttpResponsePromise<Darwin.ExecuteToolResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__executeTool(request, requestOptions));
     }
 
-    private async __createMessage(
-        request: Darwin.CreateAgentMessageRequest,
-        requestOptions?: AgentClient.RequestOptions,
-    ): Promise<core.WithRawResponse<Record<string, unknown>>> {
+    private async __executeTool(
+        request: Darwin.ExecuteToolRequest,
+        requestOptions?: ToolsClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Darwin.ExecuteToolResponse>> {
+        const { tool, ..._body } = request;
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -146,14 +133,14 @@ export class AgentClient {
                 (await core.Supplier.get(this._options.baseUrl)) ??
                     (await core.Supplier.get(this._options.environment)) ??
                     environments.DarwinEnvironment.Production,
-                "agent/messages",
+                `tools/${core.url.encodePathParam(tool)}/executions`,
             ),
             method: "POST",
             headers: _headers,
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
+            body: mergeAdditionalBodyParameters(_body, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -161,7 +148,7 @@ export class AgentClient {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Record<string, unknown>, rawResponse: _response.rawResponse };
+            return { data: _response.body as Darwin.ExecuteToolResponse, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
@@ -181,6 +168,6 @@ export class AgentClient {
             }
         }
 
-        return handleNonStatusCodeError(_response.error, _response.rawResponse, "POST", "/agent/messages");
+        return handleNonStatusCodeError(_response.error, _response.rawResponse, "POST", "/tools/{tool}/executions");
     }
 }
