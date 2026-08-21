@@ -44,8 +44,8 @@ Instantiate and use the client with the following:
 import { DarwinClient } from "@darwinso/sdk";
 
 const client = new DarwinClient({ token: "YOUR_TOKEN" });
-await client.agent.createMessage({
-    content: "content"
+await client.ais.createAi({
+    name: "name"
 });
 ```
 
@@ -69,7 +69,7 @@ following namespace:
 ```typescript
 import { Darwin } from "@darwinso/sdk";
 
-const request: Darwin.GetConversationRequest = {
+const request: Darwin.CreateAiRequest = {
     ...
 };
 ```
@@ -83,7 +83,7 @@ will be thrown.
 import { DarwinError } from "@darwinso/sdk";
 
 try {
-    await client.agent.createMessage(...);
+    await client.ais.createAi(...);
 } catch (err) {
     if (err instanceof DarwinError) {
         console.log(err.statusCode);
@@ -101,9 +101,9 @@ try {
 This SDK supports direct imports of subpackage clients, which allows JavaScript bundlers to tree-shake and include only the imported subpackage code. This results in much smaller bundle sizes.
 
 ```typescript
-import { AgentClient } from '@darwinso/sdk/agent';
+import { AccountClient } from '@darwinso/sdk/account';
 
-const client = new AgentClient({...});
+const client = new AccountClient({...});
 ```
 
 ### Additional Headers
@@ -120,7 +120,7 @@ const client = new DarwinClient({
     }
 });
 
-const response = await client.agent.createMessage(..., {
+const response = await client.ais.createAi(..., {
     headers: {
         'X-Custom-Header': 'custom value'
     }
@@ -132,7 +132,7 @@ const response = await client.agent.createMessage(..., {
 If you would like to send additional query string parameters as part of the request, use the `queryParams` request option.
 
 ```typescript
-const response = await client.agent.createMessage(..., {
+const response = await client.ais.createAi(..., {
     queryParams: {
         'customQueryParamKey': 'custom query param value'
     }
@@ -162,7 +162,7 @@ Which status codes are retried depends on the `retryStatusCodes` generator confi
 Use the `maxRetries` request option to configure this behavior.
 
 ```typescript
-const response = await client.agent.createMessage(..., {
+const response = await client.ais.createAi(..., {
     maxRetries: 0 // override maxRetries at the request level
 });
 ```
@@ -172,7 +172,7 @@ const response = await client.agent.createMessage(..., {
 The SDK defaults to a 60 second timeout. Use the `timeoutInSeconds` option to configure this behavior.
 
 ```typescript
-const response = await client.agent.createMessage(..., {
+const response = await client.ais.createAi(..., {
     timeoutInSeconds: 30 // override timeout to 30s
 });
 ```
@@ -183,7 +183,7 @@ The SDK allows users to abort requests at any point by passing in an abort signa
 
 ```typescript
 const controller = new AbortController();
-const response = await client.agent.createMessage(..., {
+const response = await client.ais.createAi(..., {
     abortSignal: controller.signal
 });
 controller.abort(); // aborts the request
@@ -195,7 +195,7 @@ The SDK provides access to raw response data, including headers, through the `.w
 The `.withRawResponse()` method returns a promise that results to an object with a `data` and a `rawResponse` property.
 
 ```typescript
-const { data, rawResponse } = await client.agent.createMessage(...).withRawResponse();
+const { data, rawResponse } = await client.ais.createAi(...).withRawResponse();
 
 console.log(data);
 console.log(rawResponse.headers['X-My-Header']);

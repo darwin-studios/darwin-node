@@ -16,7 +16,7 @@ export declare namespace IntegrationsClient {
 }
 
 /**
- * Inspect the user’s connected services and skills.
+ * Discover provider toolkits and the capabilities they make available.
  */
 export class IntegrationsClient {
     protected readonly _options: NormalizedClientOptionsWithAuth<IntegrationsClient.Options>;
@@ -26,11 +26,90 @@ export class IntegrationsClient {
     }
 
     /**
+     * @param {Darwin.GetAiIntegrationsRequest} request
      * @param {IntegrationsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Darwin.BadRequestError}
      * @throws {@link Darwin.UnauthorizedError}
      * @throws {@link Darwin.ForbiddenError}
+     * @throws {@link Darwin.NotFoundError}
+     * @throws {@link errors.DarwinError}
+     * @throws {@link errors.DarwinTimeoutError}
+     *
+     * @example
+     *     await client.integrations.getAiIntegrations({
+     *         aiId: "aiId"
+     *     })
+     */
+    public getAiIntegrations(
+        request: Darwin.GetAiIntegrationsRequest,
+        requestOptions?: IntegrationsClient.RequestOptions,
+    ): core.HttpResponsePromise<Darwin.IntegrationCatalog> {
+        return core.HttpResponsePromise.fromPromise(this.__getAiIntegrations(request, requestOptions));
+    }
+
+    private async __getAiIntegrations(
+        request: Darwin.GetAiIntegrationsRequest,
+        requestOptions?: IntegrationsClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Darwin.IntegrationCatalog>> {
+        const { aiId } = request;
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.DarwinEnvironment.Production,
+                `ais/${core.url.encodePathParam(aiId)}/integrations`,
+            ),
+            method: "GET",
+            headers: _headers,
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return { data: _response.body as Darwin.IntegrationCatalog, rawResponse: _response.rawResponse };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 400:
+                    throw new Darwin.BadRequestError(_response.error.body as Darwin.Error_, _response.rawResponse);
+                case 401:
+                    throw new Darwin.UnauthorizedError(_response.error.body as Darwin.Error_, _response.rawResponse);
+                case 403:
+                    throw new Darwin.ForbiddenError(_response.error.body as Darwin.Error_, _response.rawResponse);
+                case 404:
+                    throw new Darwin.NotFoundError(_response.error.body as Darwin.Error_, _response.rawResponse);
+                default:
+                    throw new errors.DarwinError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(_response.error, _response.rawResponse, "GET", "/ais/{aiId}/integrations");
+    }
+
+    /**
+     * User API keys only.
+     *
+     * @param {IntegrationsClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Darwin.BadRequestError}
+     * @throws {@link Darwin.UnauthorizedError}
+     * @throws {@link Darwin.ForbiddenError}
+     * @throws {@link Darwin.NotFoundError}
      * @throws {@link errors.DarwinError}
      * @throws {@link errors.DarwinTimeoutError}
      *
@@ -39,13 +118,13 @@ export class IntegrationsClient {
      */
     public getIntegrations(
         requestOptions?: IntegrationsClient.RequestOptions,
-    ): core.HttpResponsePromise<Record<string, unknown>> {
+    ): core.HttpResponsePromise<Darwin.Integrations> {
         return core.HttpResponsePromise.fromPromise(this.__getIntegrations(requestOptions));
     }
 
     private async __getIntegrations(
         requestOptions?: IntegrationsClient.RequestOptions,
-    ): Promise<core.WithRawResponse<Record<string, unknown>>> {
+    ): Promise<core.WithRawResponse<Darwin.Integrations>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -69,7 +148,7 @@ export class IntegrationsClient {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Record<string, unknown>, rawResponse: _response.rawResponse };
+            return { data: _response.body as Darwin.Integrations, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
@@ -80,6 +159,8 @@ export class IntegrationsClient {
                     throw new Darwin.UnauthorizedError(_response.error.body as Darwin.Error_, _response.rawResponse);
                 case 403:
                     throw new Darwin.ForbiddenError(_response.error.body as Darwin.Error_, _response.rawResponse);
+                case 404:
+                    throw new Darwin.NotFoundError(_response.error.body as Darwin.Error_, _response.rawResponse);
                 default:
                     throw new errors.DarwinError({
                         statusCode: _response.error.statusCode,

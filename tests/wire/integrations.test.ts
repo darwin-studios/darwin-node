@@ -5,11 +5,119 @@ import { DarwinClient } from "../../src/Client";
 import { mockServerPool } from "../mock-server/MockServerPool";
 
 describe("IntegrationsClient", () => {
-    test("getIntegrations (1)", async () => {
+    test("getAIIntegrations (1)", async () => {
         const server = mockServerPool.createServer();
         const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
 
         const rawResponseBody = { key: "value" };
+
+        server
+            .mockEndpoint()
+            .get("/ais/aiId/integrations")
+            .respondWith()
+            .statusCode(200)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        const response = await client.integrations.getAiIntegrations({
+            aiId: "aiId",
+        });
+        expect(response).toEqual(rawResponseBody);
+    });
+
+    test("getAIIntegrations (2)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/ais/aiId/integrations")
+            .respondWith()
+            .statusCode(400)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.integrations.getAiIntegrations({
+                aiId: "aiId",
+            });
+        }).rejects.toThrow(Darwin.BadRequestError);
+    });
+
+    test("getAIIntegrations (3)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/ais/aiId/integrations")
+            .respondWith()
+            .statusCode(401)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.integrations.getAiIntegrations({
+                aiId: "aiId",
+            });
+        }).rejects.toThrow(Darwin.UnauthorizedError);
+    });
+
+    test("getAIIntegrations (4)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/ais/aiId/integrations")
+            .respondWith()
+            .statusCode(403)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.integrations.getAiIntegrations({
+                aiId: "aiId",
+            });
+        }).rejects.toThrow(Darwin.ForbiddenError);
+    });
+
+    test("getAIIntegrations (5)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/ais/aiId/integrations")
+            .respondWith()
+            .statusCode(404)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.integrations.getAiIntegrations({
+                aiId: "aiId",
+            });
+        }).rejects.toThrow(Darwin.NotFoundError);
+    });
+
+    test("getIntegrations (1)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+
+        const rawResponseBody = {
+            catalog: { enabled: true, toolkits: [{ key: "value" }] },
+            connections: [{ key: "value" }],
+            skills: [{ key: "value" }],
+        };
 
         server.mockEndpoint().get("/integrations").respondWith().statusCode(200).jsonBody(rawResponseBody).build();
 
@@ -54,5 +162,18 @@ describe("IntegrationsClient", () => {
         await expect(async () => {
             return await client.integrations.getIntegrations();
         }).rejects.toThrow(Darwin.ForbiddenError);
+    });
+
+    test("getIntegrations (5)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+
+        const rawResponseBody = {};
+
+        server.mockEndpoint().get("/integrations").respondWith().statusCode(404).jsonBody(rawResponseBody).build();
+
+        await expect(async () => {
+            return await client.integrations.getIntegrations();
+        }).rejects.toThrow(Darwin.NotFoundError);
     });
 });
