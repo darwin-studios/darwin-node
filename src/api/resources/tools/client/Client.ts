@@ -17,7 +17,7 @@ export declare namespace ToolsClient {
 }
 
 /**
- * Discover and run owner-scoped Darwin capabilities.
+ * Inspect executable Darwin tools. Generic execution requires owner credentials.
  */
 export class ToolsClient {
     protected readonly _options: NormalizedClientOptionsWithAuth<ToolsClient.Options>;
@@ -27,13 +27,12 @@ export class ToolsClient {
     }
 
     /**
-     * Returns the Darwin capabilities available to developer clients, including their risk classification.
-     *
      * @param {ToolsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Darwin.BadRequestError}
      * @throws {@link Darwin.UnauthorizedError}
      * @throws {@link Darwin.ForbiddenError}
+     * @throws {@link Darwin.NotFoundError}
      * @throws {@link errors.DarwinError}
      * @throws {@link errors.DarwinTimeoutError}
      *
@@ -81,6 +80,8 @@ export class ToolsClient {
                     throw new Darwin.UnauthorizedError(_response.error.body as Darwin.Error_, _response.rawResponse);
                 case 403:
                     throw new Darwin.ForbiddenError(_response.error.body as Darwin.Error_, _response.rawResponse);
+                case 404:
+                    throw new Darwin.NotFoundError(_response.error.body as Darwin.Error_, _response.rawResponse);
                 default:
                     throw new errors.DarwinError({
                         statusCode: _response.error.statusCode,
@@ -94,7 +95,7 @@ export class ToolsClient {
     }
 
     /**
-     * Runs a Darwin capability as the API-key owner. Sensitive actions may return an approval request instead of executing immediately.
+     * User API keys only. Sensitive actions may return an approval request.
      *
      * @param {Darwin.ExecuteToolRequest} request
      * @param {ToolsClient.RequestOptions} requestOptions - Request-specific configuration.
@@ -102,6 +103,7 @@ export class ToolsClient {
      * @throws {@link Darwin.BadRequestError}
      * @throws {@link Darwin.UnauthorizedError}
      * @throws {@link Darwin.ForbiddenError}
+     * @throws {@link Darwin.NotFoundError}
      * @throws {@link errors.DarwinError}
      * @throws {@link errors.DarwinTimeoutError}
      *
@@ -113,14 +115,14 @@ export class ToolsClient {
     public executeTool(
         request: Darwin.ExecuteToolRequest,
         requestOptions?: ToolsClient.RequestOptions,
-    ): core.HttpResponsePromise<Darwin.ExecuteToolResponse> {
+    ): core.HttpResponsePromise<Darwin.ToolExecution> {
         return core.HttpResponsePromise.fromPromise(this.__executeTool(request, requestOptions));
     }
 
     private async __executeTool(
         request: Darwin.ExecuteToolRequest,
         requestOptions?: ToolsClient.RequestOptions,
-    ): Promise<core.WithRawResponse<Darwin.ExecuteToolResponse>> {
+    ): Promise<core.WithRawResponse<Darwin.ToolExecution>> {
         const { tool, ..._body } = request;
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
@@ -148,7 +150,7 @@ export class ToolsClient {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Darwin.ExecuteToolResponse, rawResponse: _response.rawResponse };
+            return { data: _response.body as Darwin.ToolExecution, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
@@ -159,6 +161,8 @@ export class ToolsClient {
                     throw new Darwin.UnauthorizedError(_response.error.body as Darwin.Error_, _response.rawResponse);
                 case 403:
                     throw new Darwin.ForbiddenError(_response.error.body as Darwin.Error_, _response.rawResponse);
+                case 404:
+                    throw new Darwin.NotFoundError(_response.error.body as Darwin.Error_, _response.rawResponse);
                 default:
                     throw new errors.DarwinError({
                         statusCode: _response.error.statusCode,

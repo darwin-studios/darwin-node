@@ -17,7 +17,7 @@ export declare namespace GoalsClient {
 }
 
 /**
- * Create and inspect goals for the agent selected on the developer/MCP channel.
+ * Create and manage the durable outcomes an AI pursues across buy, sell, and chat.
  */
 export class GoalsClient {
     protected readonly _options: NormalizedClientOptionsWithAuth<GoalsClient.Options>;
@@ -27,24 +27,35 @@ export class GoalsClient {
     }
 
     /**
+     * @param {Darwin.ListGoalsRequest} request
      * @param {GoalsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Darwin.BadRequestError}
      * @throws {@link Darwin.UnauthorizedError}
      * @throws {@link Darwin.ForbiddenError}
+     * @throws {@link Darwin.NotFoundError}
      * @throws {@link errors.DarwinError}
      * @throws {@link errors.DarwinTimeoutError}
      *
      * @example
      *     await client.goals.listGoals()
      */
-    public listGoals(requestOptions?: GoalsClient.RequestOptions): core.HttpResponsePromise<Darwin.ListGoalsResponse> {
-        return core.HttpResponsePromise.fromPromise(this.__listGoals(requestOptions));
+    public listGoals(
+        request: Darwin.ListGoalsRequest = {},
+        requestOptions?: GoalsClient.RequestOptions,
+    ): core.HttpResponsePromise<Darwin.ListGoalsResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__listGoals(request, requestOptions));
     }
 
     private async __listGoals(
+        request: Darwin.ListGoalsRequest = {},
         requestOptions?: GoalsClient.RequestOptions,
     ): Promise<core.WithRawResponse<Darwin.ListGoalsResponse>> {
+        const { aiId, mode } = request;
+        const _queryParams: Record<string, unknown> = {
+            aiId,
+            mode: mode != null ? mode : undefined,
+        };
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -60,7 +71,11 @@ export class GoalsClient {
             ),
             method: "GET",
             headers: _headers,
-            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            queryString: core.url
+                .queryBuilder()
+                .addMany(_queryParams)
+                .mergeAdditional(requestOptions?.queryParams)
+                .build(),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -79,6 +94,8 @@ export class GoalsClient {
                     throw new Darwin.UnauthorizedError(_response.error.body as Darwin.Error_, _response.rawResponse);
                 case 403:
                     throw new Darwin.ForbiddenError(_response.error.body as Darwin.Error_, _response.rawResponse);
+                case 404:
+                    throw new Darwin.NotFoundError(_response.error.body as Darwin.Error_, _response.rawResponse);
                 default:
                     throw new errors.DarwinError({
                         statusCode: _response.error.statusCode,
@@ -98,6 +115,7 @@ export class GoalsClient {
      * @throws {@link Darwin.BadRequestError}
      * @throws {@link Darwin.UnauthorizedError}
      * @throws {@link Darwin.ForbiddenError}
+     * @throws {@link Darwin.NotFoundError}
      * @throws {@link errors.DarwinError}
      * @throws {@link errors.DarwinTimeoutError}
      *
@@ -109,14 +127,14 @@ export class GoalsClient {
     public createGoal(
         request: Darwin.CreateGoalRequest,
         requestOptions?: GoalsClient.RequestOptions,
-    ): core.HttpResponsePromise<Record<string, unknown>> {
+    ): core.HttpResponsePromise<Darwin.CreateGoalResponse> {
         return core.HttpResponsePromise.fromPromise(this.__createGoal(request, requestOptions));
     }
 
     private async __createGoal(
         request: Darwin.CreateGoalRequest,
         requestOptions?: GoalsClient.RequestOptions,
-    ): Promise<core.WithRawResponse<Record<string, unknown>>> {
+    ): Promise<core.WithRawResponse<Darwin.CreateGoalResponse>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -143,7 +161,7 @@ export class GoalsClient {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Record<string, unknown>, rawResponse: _response.rawResponse };
+            return { data: _response.body as Darwin.CreateGoalResponse, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
@@ -154,6 +172,8 @@ export class GoalsClient {
                     throw new Darwin.UnauthorizedError(_response.error.body as Darwin.Error_, _response.rawResponse);
                 case 403:
                     throw new Darwin.ForbiddenError(_response.error.body as Darwin.Error_, _response.rawResponse);
+                case 404:
+                    throw new Darwin.NotFoundError(_response.error.body as Darwin.Error_, _response.rawResponse);
                 default:
                     throw new errors.DarwinError({
                         statusCode: _response.error.statusCode,
@@ -185,15 +205,18 @@ export class GoalsClient {
     public getGoal(
         request: Darwin.GetGoalRequest,
         requestOptions?: GoalsClient.RequestOptions,
-    ): core.HttpResponsePromise<Record<string, unknown>> {
+    ): core.HttpResponsePromise<Darwin.GetGoalResponse> {
         return core.HttpResponsePromise.fromPromise(this.__getGoal(request, requestOptions));
     }
 
     private async __getGoal(
         request: Darwin.GetGoalRequest,
         requestOptions?: GoalsClient.RequestOptions,
-    ): Promise<core.WithRawResponse<Record<string, unknown>>> {
-        const { id } = request;
+    ): Promise<core.WithRawResponse<Darwin.GetGoalResponse>> {
+        const { id, aiId } = request;
+        const _queryParams: Record<string, unknown> = {
+            aiId,
+        };
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -209,7 +232,11 @@ export class GoalsClient {
             ),
             method: "GET",
             headers: _headers,
-            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            queryString: core.url
+                .queryBuilder()
+                .addMany(_queryParams)
+                .mergeAdditional(requestOptions?.queryParams)
+                .build(),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -217,7 +244,7 @@ export class GoalsClient {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Record<string, unknown>, rawResponse: _response.rawResponse };
+            return { data: _response.body as Darwin.GetGoalResponse, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
@@ -240,5 +267,256 @@ export class GoalsClient {
         }
 
         return handleNonStatusCodeError(_response.error, _response.rawResponse, "GET", "/goals/{id}");
+    }
+
+    /**
+     * @param {Darwin.UpdateGoalBody} request
+     * @param {GoalsClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Darwin.BadRequestError}
+     * @throws {@link Darwin.UnauthorizedError}
+     * @throws {@link Darwin.ForbiddenError}
+     * @throws {@link Darwin.NotFoundError}
+     * @throws {@link errors.DarwinError}
+     * @throws {@link errors.DarwinTimeoutError}
+     *
+     * @example
+     *     await client.goals.updateGoal({
+     *         id: "id",
+     *         body: {}
+     *     })
+     */
+    public updateGoal(
+        request: Darwin.UpdateGoalBody,
+        requestOptions?: GoalsClient.RequestOptions,
+    ): core.HttpResponsePromise<Darwin.UpdateGoalResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__updateGoal(request, requestOptions));
+    }
+
+    private async __updateGoal(
+        request: Darwin.UpdateGoalBody,
+        requestOptions?: GoalsClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Darwin.UpdateGoalResponse>> {
+        const { id, body: _body } = request;
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.DarwinEnvironment.Production,
+                `goals/${core.url.encodePathParam(id)}`,
+            ),
+            method: "PATCH",
+            headers: _headers,
+            contentType: "application/json",
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            requestType: "json",
+            body: mergeAdditionalBodyParameters(_body, requestOptions?.additionalBodyParameters),
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return { data: _response.body as Darwin.UpdateGoalResponse, rawResponse: _response.rawResponse };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 400:
+                    throw new Darwin.BadRequestError(_response.error.body as Darwin.Error_, _response.rawResponse);
+                case 401:
+                    throw new Darwin.UnauthorizedError(_response.error.body as Darwin.Error_, _response.rawResponse);
+                case 403:
+                    throw new Darwin.ForbiddenError(_response.error.body as Darwin.Error_, _response.rawResponse);
+                case 404:
+                    throw new Darwin.NotFoundError(_response.error.body as Darwin.Error_, _response.rawResponse);
+                default:
+                    throw new errors.DarwinError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(_response.error, _response.rawResponse, "PATCH", "/goals/{id}");
+    }
+
+    /**
+     * Draft goals can activate; active goals can pause or complete; paused goals can resume or complete; completed goals can archive. Completion is blocked while negotiations, transactions, or recurring agreements remain active.
+     *
+     * @param {Darwin.ActOnGoalRequest} request
+     * @param {GoalsClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Darwin.BadRequestError}
+     * @throws {@link Darwin.UnauthorizedError}
+     * @throws {@link Darwin.ForbiddenError}
+     * @throws {@link Darwin.NotFoundError}
+     * @throws {@link errors.DarwinError}
+     * @throws {@link errors.DarwinTimeoutError}
+     *
+     * @example
+     *     await client.goals.actOnGoal({
+     *         id: "id",
+     *         body: {
+     *             action: "PAUSE"
+     *         }
+     *     })
+     */
+    public actOnGoal(
+        request: Darwin.ActOnGoalRequest,
+        requestOptions?: GoalsClient.RequestOptions,
+    ): core.HttpResponsePromise<Darwin.ActOnGoalResponse> {
+        return core.HttpResponsePromise.fromPromise(this.__actOnGoal(request, requestOptions));
+    }
+
+    private async __actOnGoal(
+        request: Darwin.ActOnGoalRequest,
+        requestOptions?: GoalsClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Darwin.ActOnGoalResponse>> {
+        const { id, body: _body } = request;
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.DarwinEnvironment.Production,
+                `goals/${core.url.encodePathParam(id)}/actions`,
+            ),
+            method: "POST",
+            headers: _headers,
+            contentType: "application/json",
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            requestType: "json",
+            body: mergeAdditionalBodyParameters(_body, requestOptions?.additionalBodyParameters),
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return { data: _response.body as Darwin.ActOnGoalResponse, rawResponse: _response.rawResponse };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 400:
+                    throw new Darwin.BadRequestError(_response.error.body as Darwin.Error_, _response.rawResponse);
+                case 401:
+                    throw new Darwin.UnauthorizedError(_response.error.body as Darwin.Error_, _response.rawResponse);
+                case 403:
+                    throw new Darwin.ForbiddenError(_response.error.body as Darwin.Error_, _response.rawResponse);
+                case 404:
+                    throw new Darwin.NotFoundError(_response.error.body as Darwin.Error_, _response.rawResponse);
+                default:
+                    throw new errors.DarwinError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(_response.error, _response.rawResponse, "POST", "/goals/{id}/actions");
+    }
+
+    /**
+     * Creates an actionable request to publish a private goal. Darwin does not publish the goal until the account resolves the request.
+     *
+     * @param {Darwin.RequestGoalPublicationRequest} request
+     * @param {GoalsClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Darwin.BadRequestError}
+     * @throws {@link Darwin.UnauthorizedError}
+     * @throws {@link Darwin.ForbiddenError}
+     * @throws {@link Darwin.NotFoundError}
+     * @throws {@link errors.DarwinError}
+     * @throws {@link errors.DarwinTimeoutError}
+     *
+     * @example
+     *     await client.goals.requestGoalPublication({
+     *         id: "id",
+     *         body: {}
+     *     })
+     */
+    public requestGoalPublication(
+        request: Darwin.RequestGoalPublicationRequest,
+        requestOptions?: GoalsClient.RequestOptions,
+    ): core.HttpResponsePromise<Darwin.PublicationRequestResult> {
+        return core.HttpResponsePromise.fromPromise(this.__requestGoalPublication(request, requestOptions));
+    }
+
+    private async __requestGoalPublication(
+        request: Darwin.RequestGoalPublicationRequest,
+        requestOptions?: GoalsClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Darwin.PublicationRequestResult>> {
+        const { id, body: _body } = request;
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.DarwinEnvironment.Production,
+                `goals/${core.url.encodePathParam(id)}/publication-requests`,
+            ),
+            method: "POST",
+            headers: _headers,
+            contentType: "application/json",
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            requestType: "json",
+            body: mergeAdditionalBodyParameters(_body, requestOptions?.additionalBodyParameters),
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return { data: _response.body as Darwin.PublicationRequestResult, rawResponse: _response.rawResponse };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 400:
+                    throw new Darwin.BadRequestError(_response.error.body as Darwin.Error_, _response.rawResponse);
+                case 401:
+                    throw new Darwin.UnauthorizedError(_response.error.body as Darwin.Error_, _response.rawResponse);
+                case 403:
+                    throw new Darwin.ForbiddenError(_response.error.body as Darwin.Error_, _response.rawResponse);
+                case 404:
+                    throw new Darwin.NotFoundError(_response.error.body as Darwin.Error_, _response.rawResponse);
+                default:
+                    throw new errors.DarwinError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(
+            _response.error,
+            _response.rawResponse,
+            "POST",
+            "/goals/{id}/publication-requests",
+        );
     }
 }

@@ -14,7 +14,7 @@ describe("ToolsClient", () => {
                 {
                     name: "name",
                     title: "title",
-                    category: "category",
+                    category: "ais",
                     description: "description",
                     risk: "read",
                     inputSchema: { key: "value" },
@@ -65,6 +65,19 @@ describe("ToolsClient", () => {
         await expect(async () => {
             return await client.tools.listTools();
         }).rejects.toThrow(Darwin.ForbiddenError);
+    });
+
+    test("listTools (5)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+
+        const rawResponseBody = {};
+
+        server.mockEndpoint().get("/tools").respondWith().statusCode(404).jsonBody(rawResponseBody).build();
+
+        await expect(async () => {
+            return await client.tools.listTools();
+        }).rejects.toThrow(Darwin.NotFoundError);
     });
 
     test("executeTool (1)", async () => {
@@ -152,5 +165,27 @@ describe("ToolsClient", () => {
                 tool: "tool",
             });
         }).rejects.toThrow(Darwin.ForbiddenError);
+    });
+
+    test("executeTool (5)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+        const rawRequestBody = {};
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .post("/tools/tool/executions")
+            .jsonBody(rawRequestBody)
+            .respondWith()
+            .statusCode(404)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.tools.executeTool({
+                tool: "tool",
+            });
+        }).rejects.toThrow(Darwin.NotFoundError);
     });
 });

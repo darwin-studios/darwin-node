@@ -3,13 +3,27 @@
 export interface Tool {
     name: string;
     title: string;
-    category: string;
+    category: Tool.Category;
     description: string;
     risk: Tool.Risk;
     inputSchema: Record<string, unknown>;
 }
 
 export namespace Tool {
+    export const Category = {
+        Ais: "ais",
+        Goals: "goals",
+        Inbox: "inbox",
+        Network: "network",
+        Work: "work",
+        Routines: "routines",
+        Connections: "connections",
+        Payments: "payments",
+        Email: "email",
+        Calendar: "calendar",
+        Knowledge: "knowledge",
+    } as const;
+    export type Category = (typeof Category)[keyof typeof Category];
     export const Risk = {
         Read: "read",
         Write: "write",

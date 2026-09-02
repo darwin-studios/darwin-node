@@ -9,7 +9,33 @@ describe("GoalsClient", () => {
         const server = mockServerPool.createServer();
         const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
 
-        const rawResponseBody = { goals: [{ key: "value" }] };
+        const rawResponseBody = {
+            goals: [
+                {
+                    id: "id",
+                    goalId: "goalId",
+                    aiId: "aiId",
+                    title: "title",
+                    intent: "intent",
+                    mode: "BUY",
+                    type: "DEMAND",
+                    lifecycleStatus: "DRAFT",
+                    publicationStatus: "NOT_PUBLISHED",
+                    visibility: "PUBLIC",
+                    accessPolicyId: "accessPolicyId",
+                    pausedUntil: "2024-01-15T09:30:00Z",
+                    archivedAt: "2024-01-15T09:30:00Z",
+                    cadence: { key: "value" },
+                    targeting: { key: "value" },
+                    context: { key: "value" },
+                    listingIds: ["listingIds"],
+                    dealTemplateKey: "dealTemplateKey",
+                    publication: { key: "value" },
+                    createdAt: "2024-01-15T09:30:00Z",
+                    updatedAt: "2024-01-15T09:30:00Z",
+                },
+            ],
+        };
 
         server.mockEndpoint().get("/goals").respondWith().statusCode(200).jsonBody(rawResponseBody).build();
 
@@ -56,11 +82,48 @@ describe("GoalsClient", () => {
         }).rejects.toThrow(Darwin.ForbiddenError);
     });
 
+    test("listGoals (5)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+
+        const rawResponseBody = {};
+
+        server.mockEndpoint().get("/goals").respondWith().statusCode(404).jsonBody(rawResponseBody).build();
+
+        await expect(async () => {
+            return await client.goals.listGoals();
+        }).rejects.toThrow(Darwin.NotFoundError);
+    });
+
     test("createGoal (1)", async () => {
         const server = mockServerPool.createServer();
         const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
         const rawRequestBody = { intent: "intent" };
-        const rawResponseBody = { key: "value" };
+        const rawResponseBody = {
+            goal: {
+                id: "id",
+                goalId: "goalId",
+                aiId: "aiId",
+                title: "title",
+                intent: "intent",
+                mode: "BUY",
+                type: "DEMAND",
+                lifecycleStatus: "DRAFT",
+                publicationStatus: "NOT_PUBLISHED",
+                visibility: "PUBLIC",
+                accessPolicyId: "accessPolicyId",
+                pausedUntil: "2024-01-15T09:30:00Z",
+                archivedAt: "2024-01-15T09:30:00Z",
+                cadence: { key: "value" },
+                targeting: { key: "value" },
+                context: { key: "value" },
+                listingIds: ["listingIds"],
+                dealTemplateKey: "dealTemplateKey",
+                publication: { key: "value" },
+                createdAt: "2024-01-15T09:30:00Z",
+                updatedAt: "2024-01-15T09:30:00Z",
+            },
+        };
 
         server
             .mockEndpoint()
@@ -143,11 +206,57 @@ describe("GoalsClient", () => {
         }).rejects.toThrow(Darwin.ForbiddenError);
     });
 
+    test("createGoal (5)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+        const rawRequestBody = { intent: "x" };
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .post("/goals")
+            .jsonBody(rawRequestBody)
+            .respondWith()
+            .statusCode(404)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.goals.createGoal({
+                intent: "x",
+            });
+        }).rejects.toThrow(Darwin.NotFoundError);
+    });
+
     test("getGoal (1)", async () => {
         const server = mockServerPool.createServer();
         const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
 
-        const rawResponseBody = { key: "value" };
+        const rawResponseBody = {
+            goal: {
+                id: "id",
+                goalId: "goalId",
+                aiId: "aiId",
+                title: "title",
+                intent: "intent",
+                mode: "BUY",
+                type: "DEMAND",
+                lifecycleStatus: "DRAFT",
+                publicationStatus: "NOT_PUBLISHED",
+                visibility: "PUBLIC",
+                accessPolicyId: "accessPolicyId",
+                pausedUntil: "2024-01-15T09:30:00Z",
+                archivedAt: "2024-01-15T09:30:00Z",
+                cadence: { key: "value" },
+                targeting: { key: "value" },
+                context: { key: "value" },
+                listingIds: ["listingIds"],
+                dealTemplateKey: "dealTemplateKey",
+                publication: { key: "value" },
+                createdAt: "2024-01-15T09:30:00Z",
+                updatedAt: "2024-01-15T09:30:00Z",
+            },
+        };
 
         server.mockEndpoint().get("/goals/id").respondWith().statusCode(200).jsonBody(rawResponseBody).build();
 
@@ -213,6 +322,430 @@ describe("GoalsClient", () => {
         await expect(async () => {
             return await client.goals.getGoal({
                 id: "id",
+            });
+        }).rejects.toThrow(Darwin.NotFoundError);
+    });
+
+    test("updateGoal (1)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+        const rawRequestBody = {};
+        const rawResponseBody = {
+            goal: {
+                id: "id",
+                goalId: "goalId",
+                aiId: "aiId",
+                title: "title",
+                intent: "intent",
+                mode: "BUY",
+                type: "DEMAND",
+                lifecycleStatus: "DRAFT",
+                publicationStatus: "NOT_PUBLISHED",
+                visibility: "PUBLIC",
+                accessPolicyId: "accessPolicyId",
+                pausedUntil: "2024-01-15T09:30:00Z",
+                archivedAt: "2024-01-15T09:30:00Z",
+                cadence: { key: "value" },
+                targeting: { key: "value" },
+                context: { key: "value" },
+                listingIds: ["listingIds"],
+                dealTemplateKey: "dealTemplateKey",
+                publication: { key: "value" },
+                createdAt: "2024-01-15T09:30:00Z",
+                updatedAt: "2024-01-15T09:30:00Z",
+            },
+        };
+
+        server
+            .mockEndpoint()
+            .patch("/goals/id")
+            .jsonBody(rawRequestBody)
+            .respondWith()
+            .statusCode(200)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        const response = await client.goals.updateGoal({
+            id: "id",
+            body: {},
+        });
+        expect(response).toEqual(rawResponseBody);
+    });
+
+    test("updateGoal (2)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+        const rawRequestBody = {};
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .patch("/goals/id")
+            .jsonBody(rawRequestBody)
+            .respondWith()
+            .statusCode(400)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.goals.updateGoal({
+                id: "id",
+                body: {},
+            });
+        }).rejects.toThrow(Darwin.BadRequestError);
+    });
+
+    test("updateGoal (3)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+        const rawRequestBody = {};
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .patch("/goals/id")
+            .jsonBody(rawRequestBody)
+            .respondWith()
+            .statusCode(401)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.goals.updateGoal({
+                id: "id",
+                body: {},
+            });
+        }).rejects.toThrow(Darwin.UnauthorizedError);
+    });
+
+    test("updateGoal (4)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+        const rawRequestBody = {};
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .patch("/goals/id")
+            .jsonBody(rawRequestBody)
+            .respondWith()
+            .statusCode(403)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.goals.updateGoal({
+                id: "id",
+                body: {},
+            });
+        }).rejects.toThrow(Darwin.ForbiddenError);
+    });
+
+    test("updateGoal (5)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+        const rawRequestBody = {};
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .patch("/goals/id")
+            .jsonBody(rawRequestBody)
+            .respondWith()
+            .statusCode(404)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.goals.updateGoal({
+                id: "id",
+                body: {},
+            });
+        }).rejects.toThrow(Darwin.NotFoundError);
+    });
+
+    test("actOnGoal (1)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+        const rawRequestBody = { action: "PAUSE" };
+        const rawResponseBody = {
+            goal: {
+                id: "id",
+                goalId: "goalId",
+                aiId: "aiId",
+                title: "title",
+                intent: "intent",
+                mode: "BUY",
+                type: "DEMAND",
+                lifecycleStatus: "DRAFT",
+                publicationStatus: "NOT_PUBLISHED",
+                visibility: "PUBLIC",
+                accessPolicyId: "accessPolicyId",
+                pausedUntil: "2024-01-15T09:30:00Z",
+                archivedAt: "2024-01-15T09:30:00Z",
+                cadence: { key: "value" },
+                targeting: { key: "value" },
+                context: { key: "value" },
+                listingIds: ["listingIds"],
+                dealTemplateKey: "dealTemplateKey",
+                publication: { key: "value" },
+                createdAt: "2024-01-15T09:30:00Z",
+                updatedAt: "2024-01-15T09:30:00Z",
+            },
+        };
+
+        server
+            .mockEndpoint()
+            .post("/goals/id/actions")
+            .jsonBody(rawRequestBody)
+            .respondWith()
+            .statusCode(200)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        const response = await client.goals.actOnGoal({
+            id: "id",
+            body: {
+                action: "PAUSE",
+            },
+        });
+        expect(response).toEqual(rawResponseBody);
+    });
+
+    test("actOnGoal (2)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+        const rawRequestBody = { action: "PAUSE" };
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .post("/goals/id/actions")
+            .jsonBody(rawRequestBody)
+            .respondWith()
+            .statusCode(400)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.goals.actOnGoal({
+                id: "id",
+                body: {
+                    action: "PAUSE",
+                },
+            });
+        }).rejects.toThrow(Darwin.BadRequestError);
+    });
+
+    test("actOnGoal (3)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+        const rawRequestBody = { action: "PAUSE" };
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .post("/goals/id/actions")
+            .jsonBody(rawRequestBody)
+            .respondWith()
+            .statusCode(401)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.goals.actOnGoal({
+                id: "id",
+                body: {
+                    action: "PAUSE",
+                },
+            });
+        }).rejects.toThrow(Darwin.UnauthorizedError);
+    });
+
+    test("actOnGoal (4)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+        const rawRequestBody = { action: "PAUSE" };
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .post("/goals/id/actions")
+            .jsonBody(rawRequestBody)
+            .respondWith()
+            .statusCode(403)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.goals.actOnGoal({
+                id: "id",
+                body: {
+                    action: "PAUSE",
+                },
+            });
+        }).rejects.toThrow(Darwin.ForbiddenError);
+    });
+
+    test("actOnGoal (5)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+        const rawRequestBody = { action: "PAUSE" };
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .post("/goals/id/actions")
+            .jsonBody(rawRequestBody)
+            .respondWith()
+            .statusCode(404)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.goals.actOnGoal({
+                id: "id",
+                body: {
+                    action: "PAUSE",
+                },
+            });
+        }).rejects.toThrow(Darwin.NotFoundError);
+    });
+
+    test("requestGoalPublication (1)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+        const rawRequestBody = {};
+        const rawResponseBody = {
+            request: {
+                id: "id",
+                aiId: "aiId",
+                mode: "BUY",
+                intent: "BUY",
+                role: "role",
+                status: "PENDING",
+                title: "title",
+                message: "message",
+                senderAi: { key: "value" },
+                recipientAi: { key: "value" },
+                listings: [{ key: "value" }],
+                proposedDealTemplateKey: "proposedDealTemplateKey",
+                proposedTerms: { key: "value" },
+                proposedSteps: [{ key: "value" }],
+                matchReason: "matchReason",
+                compatibleGoals: [{ key: "value" }],
+                receivedAt: "2024-01-15T09:30:00Z",
+                respondedAt: "2024-01-15T09:30:00Z",
+                createdAt: "2024-01-15T09:30:00Z",
+                updatedAt: "2024-01-15T09:30:00Z",
+            },
+            traceId: "traceId",
+        };
+
+        server
+            .mockEndpoint()
+            .post("/goals/id/publication-requests")
+            .jsonBody(rawRequestBody)
+            .respondWith()
+            .statusCode(200)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        const response = await client.goals.requestGoalPublication({
+            id: "id",
+            body: {},
+        });
+        expect(response).toEqual(rawResponseBody);
+    });
+
+    test("requestGoalPublication (2)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+        const rawRequestBody = {};
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .post("/goals/id/publication-requests")
+            .jsonBody(rawRequestBody)
+            .respondWith()
+            .statusCode(400)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.goals.requestGoalPublication({
+                id: "id",
+                body: {},
+            });
+        }).rejects.toThrow(Darwin.BadRequestError);
+    });
+
+    test("requestGoalPublication (3)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+        const rawRequestBody = {};
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .post("/goals/id/publication-requests")
+            .jsonBody(rawRequestBody)
+            .respondWith()
+            .statusCode(401)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.goals.requestGoalPublication({
+                id: "id",
+                body: {},
+            });
+        }).rejects.toThrow(Darwin.UnauthorizedError);
+    });
+
+    test("requestGoalPublication (4)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+        const rawRequestBody = {};
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .post("/goals/id/publication-requests")
+            .jsonBody(rawRequestBody)
+            .respondWith()
+            .statusCode(403)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.goals.requestGoalPublication({
+                id: "id",
+                body: {},
+            });
+        }).rejects.toThrow(Darwin.ForbiddenError);
+    });
+
+    test("requestGoalPublication (5)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new DarwinClient({ maxRetries: 0, token: "test", environment: server.baseUrl });
+        const rawRequestBody = {};
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .post("/goals/id/publication-requests")
+            .jsonBody(rawRequestBody)
+            .respondWith()
+            .statusCode(404)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.goals.requestGoalPublication({
+                id: "id",
+                body: {},
             });
         }).rejects.toThrow(Darwin.NotFoundError);
     });
