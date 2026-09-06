@@ -16,6 +16,7 @@
     "url": "git+https://github.com/darwin-studios/darwin-node.git"
   },
   "license": "MIT",
+  "packageManager": "pnpm@10.6.3",
   "main": "./generated/cjs/index.js",
   "module": "./generated/esm/index.mjs",
   "types": "./generated/esm/index.d.mts",
